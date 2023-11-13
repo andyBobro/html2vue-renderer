@@ -3,6 +3,12 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "types": "./dist/main.d.ts",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/html2vue-renderer.umd.cjs",
+  "module": "./dist/html2vue-renderer.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build && vue-tsc --emitDeclarationOnly",
@@ -11,7 +17,7 @@
   "exports": {
     ".": {
       "import": "./dist/html2vue-renderer.js",
-      "require": "./dist/html2vue-renderer.umd.js"
+      "require": "./dist/html2vue-renderer.umd.cjs"
     }
   },
   "dependencies": {
