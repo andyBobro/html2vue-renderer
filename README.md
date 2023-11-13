@@ -35,7 +35,7 @@ import { HTML2Vue } from 'html2vue-renderer';
   <HTML2Vue :value="value" />
 ```
 
-`componentsMap` - Record<string, Component> Object represents components allowed to render in HTML string
+`componentsMap` - `Record<string, Component>` Object represents components allowed to render in HTML string
 ```
 <HTML2Vue :value="'<div><some-component>Some text</some-coomponent></div>'" :componentsMap="{
   'SomeComponent': SomeComponent
