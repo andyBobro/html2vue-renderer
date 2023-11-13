@@ -7,6 +7,11 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andyBobro/html2vue-renderer.git"
+  },
+  "homepage": "https://github.com/andyBobro/html2vue-renderer#readme",
   "main": "./dist/html2vue-renderer.umd.cjs",
   "module": "./dist/html2vue-renderer.js",
   "scripts": {
