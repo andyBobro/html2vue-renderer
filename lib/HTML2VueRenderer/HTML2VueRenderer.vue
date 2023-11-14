@@ -2,42 +2,47 @@
 import type { Ref } from "vue"
 import type { ComponentsMap } from './Renderer'
 
-interface DocProps {
-  string?: any
-}
-
 interface Props {
   value: string,
-  docProps: any,
-  componentsMap: ComponentsMap
+  docProps?: any,
+  componentsMap?: ComponentsMap
 }
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import Renderer from './Renderer'
 
 const props = withDefaults(defineProps<Props>(), {
   value: '',
-  docProps: () => ({} as DocProps),
-  componentsMap: () => ({} as ComponentsMap)
+  docProps: () => ({}),
+  componentsMap: () => ({})
 })
 
-const renderer = new Renderer({
+const renderer = ref(new Renderer({
   value: props.value,
-  componentsMap: props.componentsMap 
-})
+  componentsMap: props.componentsMap
+}))
+
 
 const vNodes: Ref = ref([])
 
 onMounted(() => {
-  vNodes.value = renderer.render(props.docProps)
+  vNodes.value = renderer.value.render(props.docProps)
+})
+
+watch(() => props.value, () => {
+  renderer.value = new Renderer({
+    value: props.value,
+    componentsMap: props.componentsMap
+  })
+  vNodes.value = renderer.value.render(props.docProps)
 })
 </script>
 
 <template>
   <div class="html-renderer-wrapper">
-    <template v-for="(node, n) in vNodes" :key="n">
+    <template v-for="node in vNodes">
       <component :is="node" />
     </template>
   </div>

@@ -1,17 +1,17 @@
 import type { Component } from "vue"
 import { h, defineComponent, createTextVNode } from 'vue'
 
-interface DomComponentData {
-  component: Component,
-  el: Element,
-  name: string,
-  elName?: string,
-  tagName?: string,
+
+export type ComponentsMap = Record<string, {
+    name: string,
+    component: Component
+  }>
+
+interface RendererProps {
+  value: string
+  componentsMap: ComponentsMap
 }
-
-export type ComponentsMap = Record<string, Record<string, string | Component>>
-
-export default class Renderer {
+export default class Renderer implements RendererProps {
   value: string
   componentsMap: ComponentsMap
   DOM: HTMLElement[] | Element[] | null
@@ -25,10 +25,10 @@ export default class Renderer {
     this.init()
   }
 
-  initDOM () {
+  initDOM (value: string | undefined  = undefined) {
     const DOM = document.createElement('div')
     
-    DOM.innerHTML = this.value
+    DOM.innerHTML = value || this.value
 
     return [...DOM.children]
   }
