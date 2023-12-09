@@ -1,17 +1,13 @@
-<script lang="ts">
-import type { Ref } from "vue"
-import type { ComponentsMap } from './Renderer'
+<script setup lang="ts">
+import { ref, onMounted, watch, type Component, type Ref } from 'vue'
+import Renderer from './Renderer'
+import { VueLoader } from './loaders/index'
 
 interface Props {
   value: string,
   docProps?: any,
-  componentsMap?: ComponentsMap
+  componentsMap?: Record<string, Component>
 }
-</script>
-
-<script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
-import Renderer from './Renderer'
 
 const props = withDefaults(defineProps<Props>(), {
   value: '',
@@ -19,25 +15,34 @@ const props = withDefaults(defineProps<Props>(), {
   componentsMap: () => ({})
 })
 
-const renderer = ref(new Renderer({
-  value: props.value,
-  componentsMap: props.componentsMap
-}))
+const renderer = ref(loadRenderer(props.value))
 
 
 const vNodes: Ref = ref([])
 
 onMounted(() => {
-  vNodes.value = renderer.value.render(props.docProps)
+  vNodes.value = renderer.value.render()
 })
 
-watch(() => props.value, () => {
-  renderer.value = new Renderer({
-    value: props.value,
-    componentsMap: props.componentsMap
-  })
-  vNodes.value = renderer.value.render(props.docProps)
+watch(() => props.value, (val) => {
+  renderer.value = loadRenderer(val)
+  vNodes.value = renderer.value.render()
 })
+
+watch(() => props.docProps, (val) => {
+  renderer.value = loadRenderer(val)
+  vNodes.value = renderer.value.render()
+})
+
+function loadRenderer(value: string) {
+  return new Renderer({
+    value: value,
+    loader: new VueLoader({
+      components: props.componentsMap,
+      props: props.docProps
+    })
+  })
+}
 </script>
 
 <template>

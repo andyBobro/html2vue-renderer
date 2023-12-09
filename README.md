@@ -1,10 +1,20 @@
 # html2vue-renderer
 
-Deadly simple Vue 3 component takes html string as input and returns Vue components tree. HTML string can include Vue components with some restrictions
+Component is an alternative for v-html directive allows to include components to html markup. It can be useful for rendering fetched html content and to add it some interactivity.
+
+#### It has some restrictions:
+
+- you have to always close component's tag
+- attributes and props names have to be in `kebab-case`
+- events on component are not working yet
+
+## Requirements:
+
+- [Vue.js](https://github.com/vuejs/vue) `3.x`
 
 ## Install:
 
-```
+```bash
 npm install html2vue-renderer
 
 # OR
@@ -12,49 +22,97 @@ npm install html2vue-renderer
 yarn add html2vue-renderer
 ```
 
-## Usage:
+## Simple usage:
 
-```
+```javascript
 <script setup lang="ts">
-import { HTML2Vue } from 'html2vue-renderer';
+import { ref } from 'vue'
+import { HTML2Vue } from 'html2vue-renderer'
+
+const html = ref('<h1>hello html</h1>')
 </script>
 
 <template>
-  <div>
-    HTML renderer
-    <HTML2Vue :value="'<h1>hello html</h1>'" />
-  </div>
+  <HTML2Vue :value="html" />
 </template>
 ```
 
-## Props:
+## Usage with vue components and props for them:
 
-`value` - HTML string
+In `<SomeComponent>` `:some-prop` will take any data from `docProps['someValue']` and `some-other-prop` will take string `'some-other-value'`
 
+```javascript
+<script setup lang="ts">
+import { ref } from 'vue'
+import { HTML2Vue } from 'html2vue-renderer'
+import SomeComponent from './SomeComponent'
+
+const html = `
+  <h1>Heading</h1>
+  <SomeComponent :some-prop="someValue" some-other-prop="some-other-value">
+    Veeery long text
+  </SomeComponent>
+`
+
+const docProps = {
+  someValue: 'Some Value'
+}
+</script>
+
+<template>
+  <HTML2Vue :value="html" :componentsMap={ SomeComponent } :docProps="docProps" />
+</template>
 ```
-  <HTML2Vue :value="value" />
+
+## Props
+
+#### value
+
+Type: `string`<br>
+Required: `true`<br>
+
+HTML string can contain vue components defined in `componentsMap` prop
+
+#### componentsMap
+
+Type: `Record<string, Component>`<br>
+Required: `false`<br>
+Default: `{}`<br>
+
+Object represents components can be included into HTML markup. Key in this object have to be same with name of component's tag included into markup.
+
+#### docProps
+
+Type: `Record<string, any>`<br>
+Required: `false`<br>
+Default: `{}`<br>
+
+Object represents data to be passed to components in the markup. Keys in this object have to be same with the idetifier in the markup.
+
+example:
+
+```javascript
+<script setup lang="ts">
+import { ref } from 'vue'
+import { HTML2Vue } from 'html2vue-renderer'
+import SomeComponent from './SomeComponent'
+
+const html = `
+  <h1>Heading</h1>
+  {/* identifier `someValue` passed to <SomeComponent> in `some-prop` prop is the same with key in `docProps`  */}
+  <SomeComponent :some-prop="someValue">
+    Veeery long text
+  </SomeComponent>
+`
+
+const docProps = {
+  // key `someValue` is the same with identifier passed to <SomeComponent>
+  someValue: 'Some Value'
+}
+</script>
+
+<template>
+  <HTML2Vue :value="html" :componentsMap={ SomeComponent } :docProps="docProps" />
+</template>
 ```
-
-`componentsMap` - `Record<string, Component>` Object represents components allowed to render in HTML string
-
-```
-<HTML2Vue :value="'<div><some-component>Some text</some-coomponent></div>'" :componentsMap="{
-  'SomeComponent': SomeComponent
-}" />
-```
-
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-## Type Support For `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
 
