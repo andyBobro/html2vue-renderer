@@ -3,7 +3,7 @@
   "description": "Component is an alternative for v-html directive allows to include components to html markup. It can be useful for rendering fetched html content and to add it some interactivity.",
   "keywords": ["vue.js", "render", "HTML", "vue-component", "component"],
   "private": false,
-  "version": "0.0.4",
+  "version": "0.0.41",
   "type": "module",
   "types": "./dist/main.d.ts",
   "files": [
