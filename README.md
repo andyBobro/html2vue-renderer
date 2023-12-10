@@ -68,7 +68,7 @@ const docProps = {
 
 #### value
 
-Type: `string`<br>
+Type: `HTMLstring`<br>
 Required: `true`<br>
 
 HTML string can contain vue components defined in `componentsMap` prop
@@ -97,9 +97,9 @@ import { ref } from 'vue'
 import { HTML2Vue } from 'html2vue-renderer'
 import SomeComponent from './SomeComponent'
 
+// identifier `someValue` passed to <SomeComponent> in `some-prop` prop is the same with key in `docProps
 const html = `
   <h1>Heading</h1>
-  {/* identifier `someValue` passed to <SomeComponent> in `some-prop` prop is the same with key in `docProps`  */}
   <SomeComponent :some-prop="someValue">
     Veeery long text
   </SomeComponent>
@@ -113,6 +113,29 @@ const docProps = {
 
 <template>
   <HTML2Vue :value="html" :componentsMap={ SomeComponent } :docProps="docProps" />
+</template>
+```
+
+## Events
+
+#### mounted
+
+event payload: `HTMLElement` with rendered content
+
+```javascript
+<script setup lang="ts">
+import { ref } from 'vue'
+import { HTML2Vue } from 'html2vue-renderer'
+
+const html = ref('<h1>hello html</h1>')
+
+function onMountHandler (event) {
+  console.log(event) // fires wrapper of rendered content
+}
+</script>
+
+<template>
+  <HTML2Vue @mounted="onMountHandler" :value="html" />
 </template>
 ```
 

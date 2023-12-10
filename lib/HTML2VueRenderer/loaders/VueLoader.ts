@@ -1,4 +1,4 @@
-import { createTextVNode, h, defineComponent, type Component, VNode } from "vue"
+import { createTextVNode, h, defineComponent, onMounted, type Component, type VNode } from "vue"
 
 type ElementAttrDataType = 'attribute' | 'prop' | 'listener'
 
@@ -35,16 +35,16 @@ export class VueLoader {
       case ':':
         return {
           type:'prop', 
-          attr: key.slice(0, 1),
+          attr: key.slice(1),
           rawAttr: key, 
-          value: this.getAttributeValue(el, key.slice(0, 1)) 
+          value: this.getAttributeValue(el, key) 
         }
       case '@':
         return {
           type:'listener', 
           attr: key.slice(0, 1), 
           rawAttr: key, 
-          value: this.getAttributeValue(el, key.slice(0, 1)) 
+          value: this.getAttributeValue(el, key.slice(1)) 
         }
       default:
         return {
@@ -56,7 +56,10 @@ export class VueLoader {
     }
   }
   getAttributeValue (el: HTMLElement, key: string) {
-    if (this.props && this.props[key]) return this.props[key]
+    const propsKey = el.getAttribute(key) as string
+    if (this.props && el && Object.prototype.hasOwnProperty.call(this.props, propsKey)) {
+      return this.props[propsKey]
+    }
 
     return el.getAttribute(key)
   }
@@ -85,7 +88,7 @@ export class VueLoader {
     const component = this.resolveComponent(el)
     const attrs = this.getAttrs(el)
     const props = this.resolveProps(attrs)
-    
+
     return h(component, props, {
       default: () => children
     })

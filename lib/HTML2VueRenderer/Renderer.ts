@@ -1,4 +1,4 @@
-import { h, defineComponent, createTextVNode, type Component, VNode, VNodeArrayChildren } from 'vue'
+import { type Component, VNode } from 'vue'
 
 export type ComponentsMap = Record<string, {
     name: string,
@@ -7,7 +7,8 @@ export type ComponentsMap = Record<string, {
 
 interface Loader {
   renderText: (el: HTMLElement) => any
-  renderElement: (el: HTMLElement, children: HTMLElement[]) => any
+  // @ts-ignore TODO
+  renderElement: (el: HTMLElement, children) => any
   renderRoot: (vnode: VNode) => Component
 }
 

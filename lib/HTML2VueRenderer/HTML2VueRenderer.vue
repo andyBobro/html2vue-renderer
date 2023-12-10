@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, type Component, type Ref } from 'vue'
+import { shallowRef, onMounted, watch, type Component, type Ref, markRaw } from 'vue'
 import Renderer from './Renderer'
 import { VueLoader } from './loaders/index'
 
@@ -15,21 +15,25 @@ const props = withDefaults(defineProps<Props>(), {
   componentsMap: () => ({})
 })
 
-const renderer = ref(loadRenderer(props.value))
+const components = Object.entries(props.componentsMap).reduce((acc, [key, val]) => ({
+  ...acc,
+  [key]: markRaw(val)
+}), {})
 
+const renderer = shallowRef(loadRenderer(props.value))
 
-const vNodes: Ref = ref([])
+const vNodes: Ref = shallowRef([])
+
+const rendererWrapper = shallowRef(null)
+
+const emit = defineEmits(['mounted'])
 
 onMounted(() => {
   vNodes.value = renderer.value.render()
+  emit('mounted', rendererWrapper.value)
 })
 
 watch(() => props.value, (val) => {
-  renderer.value = loadRenderer(val)
-  vNodes.value = renderer.value.render()
-})
-
-watch(() => props.docProps, (val) => {
   renderer.value = loadRenderer(val)
   vNodes.value = renderer.value.render()
 })
@@ -38,7 +42,7 @@ function loadRenderer(value: string) {
   return new Renderer({
     value: value,
     loader: new VueLoader({
-      components: props.componentsMap,
+      components: components,
       props: props.docProps
     })
   })
@@ -46,7 +50,7 @@ function loadRenderer(value: string) {
 </script>
 
 <template>
-  <div class="html-renderer-wrapper">
+  <div class="html-renderer-wrapper" ref="rendererWrapper">
     <template v-for="node in vNodes">
       <component :is="node" />
     </template>
