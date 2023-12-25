@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { shallowRef, onMounted, watch, type Component, type Ref, markRaw } from 'vue'
+import { nextTick, shallowRef, onMounted, watch, type Component, type Ref, markRaw } from 'vue'
 import Renderer from './Renderer'
 import { VueLoader } from './loaders/index'
 
@@ -30,13 +30,17 @@ const emit = defineEmits(['mounted', 'updated'])
 
 onMounted(() => {
   vNodes.value = renderer.value.render()
-  emit('mounted', rendererWrapper.value)
+  nextTick(() => {
+    emit('mounted', rendererWrapper.value)
+  })
 })
 
 watch(() => props.value, (val) => {
   renderer.value = loadRenderer(val)
   vNodes.value = renderer.value.render()
-  emit('updated', rendererWrapper.value)
+  nextTick(() => {
+    emit('updated', rendererWrapper.value)
+  })
 })
 
 function loadRenderer(value: string) {
