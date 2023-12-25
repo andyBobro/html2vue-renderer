@@ -139,3 +139,24 @@ function onMountHandler (event) {
 </template>
 ```
 
+#### updated
+
+event payload: `HTMLElement` with re-rendered content
+
+```javascript
+<script setup lang="ts">
+import { ref } from 'vue'
+import { HTML2Vue } from 'html2vue-renderer'
+
+const html = ref('<h1>hello html</h1>')
+
+function onUpdateHandler (event) {
+  console.log(event) // fires wrapper of re-rendered content
+}
+</script>
+
+<template>
+  <HTML2Vue @updated="onUpdateHandler" :value="html" />
+</template>
+```
+

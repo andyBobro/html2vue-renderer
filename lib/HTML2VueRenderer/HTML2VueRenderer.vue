@@ -26,7 +26,7 @@ const vNodes: Ref = shallowRef([])
 
 const rendererWrapper = shallowRef(null)
 
-const emit = defineEmits(['mounted'])
+const emit = defineEmits(['mounted', 'updated'])
 
 onMounted(() => {
   vNodes.value = renderer.value.render()
@@ -36,6 +36,7 @@ onMounted(() => {
 watch(() => props.value, (val) => {
   renderer.value = loadRenderer(val)
   vNodes.value = renderer.value.render()
+  emit('updated', rendererWrapper.value)
 })
 
 function loadRenderer(value: string) {
