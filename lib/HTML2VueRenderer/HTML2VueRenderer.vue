@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { nextTick, shallowRef, onMounted, watch, type Component, type Ref, markRaw } from 'vue'
-import Renderer from './Renderer'
+import Renderer, { type ExtendLoader as EL } from './Renderer'
 import { VueLoader } from './loaders/index'
 
+export type ExtendLoader = EL
+
 interface Props {
-  value: string,
-  docProps?: any,
+  value: string
+  docProps?: any
   componentsMap?: Record<string, Component>
+  extendLoader?: EL
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -15,10 +18,13 @@ const props = withDefaults(defineProps<Props>(), {
   componentsMap: () => ({})
 })
 
-const components = Object.entries(props.componentsMap).reduce((acc, [key, val]) => ({
-  ...acc,
-  [key]: markRaw(val)
-}), {})
+const components = Object.entries(props.componentsMap).reduce(
+  (acc, [key, val]) => ({
+    ...acc,
+    [key]: markRaw(val)
+  }),
+  {}
+)
 
 const renderer = shallowRef(loadRenderer(props.value))
 
@@ -35,17 +41,21 @@ onMounted(() => {
   })
 })
 
-watch(() => props.value, (val) => {
-  renderer.value = loadRenderer(val)
-  vNodes.value = renderer.value.render()
-  nextTick(() => {
-    emit('updated', rendererWrapper.value)
-  })
-})
+watch(
+  () => props.value,
+  (val) => {
+    renderer.value = loadRenderer(val)
+    vNodes.value = renderer.value.render()
+    nextTick(() => {
+      emit('updated', rendererWrapper.value)
+    })
+  }
+)
 
 function loadRenderer(value: string) {
   return new Renderer({
     value: value,
+    extendLoader: props?.extendLoader,
     loader: new VueLoader({
       components: components,
       props: props.docProps
